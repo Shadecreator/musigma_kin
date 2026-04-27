@@ -1,0 +1,19 @@
+.env
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database (SQLite)
+*.db
+*.db-journal
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Temporary files
+temp_*.txt
+test_*.txt
