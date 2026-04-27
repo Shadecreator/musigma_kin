@@ -1,0 +1,116 @@
+[
+  {
+    "id": 1,
+    "drug": "Metformin",
+    "dose": "1000mg",
+    "frequency": "Twice daily",
+    "timing": "With meals (morning and evening)",
+    "purpose": "Type 2 Diabetes — blood sugar control",
+    "last_refill": "March 2026",
+    "prescriber": "Dr. Priya Nair (GP)"
+  },
+  {
+    "id": 2,
+    "drug": "Glipizide",
+    "dose": "5mg",
+    "frequency": "Once daily",
+    "timing": "Morning",
+    "purpose": "Type 2 Diabetes — stimulates insulin release",
+    "last_refill": "March 2026",
+    "prescriber": "Dr. Priya Nair (GP)"
+  },
+  {
+    "id": 3,
+    "drug": "Lisinopril",
+    "dose": "10mg",
+    "frequency": "Once daily",
+    "timing": "Morning",
+    "purpose": "Hypertension / kidney protection",
+    "last_refill": "February 2026",
+    "prescriber": "Dr. Priya Nair (GP)"
+  },
+  {
+    "id": 4,
+    "drug": "Amlodipine",
+    "dose": "5mg",
+    "frequency": "Once daily",
+    "timing": "Morning",
+    "purpose": "Hypertension — calcium channel blocker",
+    "last_refill": "February 2026",
+    "prescriber": "Dr. Suresh Iyer (Cardiologist)"
+  },
+  {
+    "id": 5,
+    "drug": "Metoprolol",
+    "dose": "25mg",
+    "frequency": "Once daily",
+    "timing": "Evening — FREQUENTLY MISSED",
+    "purpose": "Hypertension / heart rate control — beta blocker",
+    "last_refill": "March 2026",
+    "prescriber": "Dr. Suresh Iyer (Cardiologist)",
+    "compliance_note": "Sara reports missed approximately 2x per week. Missing causes rebound HR elevation."
+  },
+  {
+    "id": 6,
+    "drug": "Furosemide",
+    "dose": "20mg",
+    "frequency": "Once daily",
+    "timing": "Morning",
+    "purpose": "Mild fluid retention — loop diuretic",
+    "last_refill": "January 2026",
+    "prescriber": "Dr. Priya Nair (GP)",
+    "compliance_note": "Increases potassium loss — must be taken with KCl supplement."
+  },
+  {
+    "id": 7,
+    "drug": "Atorvastatin",
+    "dose": "20mg",
+    "frequency": "Once daily",
+    "timing": "Evening — FREQUENTLY MISSED",
+    "purpose": "Cholesterol management — statin",
+    "last_refill": "March 2026",
+    "prescriber": "Dr. Priya Nair (GP)"
+  },
+  {
+    "id": 8,
+    "drug": "Aspirin",
+    "dose": "75mg",
+    "frequency": "Once daily",
+    "timing": "Morning",
+    "purpose": "Cardiovascular event prevention — antiplatelet",
+    "last_refill": "April 2026",
+    "prescriber": "Dr. Suresh Iyer (Cardiologist)"
+  },
+  {
+    "id": 9,
+    "drug": "Omeprazole",
+    "dose": "20mg",
+    "frequency": "Once daily",
+    "timing": "Morning (before food)",
+    "purpose": "Gastric protection — PPI (protects stomach from Aspirin)",
+    "last_refill": "February 2026",
+    "prescriber": "Dr. Priya Nair (GP)"
+  },
+  {
+    "id": 10,
+    "drug": "Vitamin D3",
+    "dose": "1000 IU",
+    "frequency": "Once daily",
+    "timing": "Morning (with food)",
+    "purpose": "Vitamin D deficiency correction",
+    "last_refill": "April 2026",
+    "prescriber": "Dr. Priya Nair (GP)",
+    "compliance_note": "Level improving: 28 nmol/L (Oct 2025) -> 42 nmol/L (Apr 2026). Target >50."
+  },
+  {
+    "id": 11,
+    "drug": "Potassium Chloride",
+    "dose": "600mg",
+    "frequency": "Once daily",
+    "timing": "Evening — FREQUENTLY MISSED",
+    "purpose": "Electrolyte balance — offsets potassium loss from Furosemide",
+    "last_refill": "February 2026",
+    "prescriber": "Dr. Priya Nair (GP)",
+    "compliance_note": "CRITICAL: Missing this while on Furosemide risks hypokalemia. Potassium was 3.4 mEq/L in ER visit (borderline low). Current 3.6 mEq/L — still low-normal."
+  }
+]
