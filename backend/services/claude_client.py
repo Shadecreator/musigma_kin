@@ -64,6 +64,37 @@ def extract_pdf_vision(base64_pdf: str, media_type: str = "application/pdf") -> 
     except Exception as e:
         return f"Extraction failed: {str(e)}"
 
+def call_claude_json(prompt: str, system_message: str = "You are a helpful medical assistant.") -> dict:
+    """
+    Send a prompt to Claude and expect a JSON response.
+    Includes error handling for parsing.
+    """
+    import json
+    
+    if client.api_key == "placeholder" or client.api_key == "your_api_key_here":
+        # Mock response for testing without API key
+        return {"mock_response": "Add API key to see real AI analysis."}
+        
+    try:
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=4096,
+            system=system_message,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        text = response.content[0].text
+        # Try to find JSON block if Claude adds preamble
+        if "```json" in text:
+            text = text.split("```json")[1].split("```")[0].strip()
+        elif "{" in text:
+            text = text[text.find("{"):text.rfind("}")+1]
+            
+        return json.loads(text)
+    except Exception as e:
+        return {"error": f"Claude call failed: {str(e)}", "raw_text": text if 'text' in locals() else None}
+
 def extract_text_pypdf(file_path: str) -> str:
     """Fallback text extraction if Vision is not used or API fails."""
     import pypdf

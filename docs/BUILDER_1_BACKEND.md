@@ -50,12 +50,29 @@ You can view the interactive Swagger UI documentation by navigating to `http://l
 | `POST` | `/session` | Creates a new session and returns a `session_id` (UUID). |
 | `POST` | `/ingest` | Accepts a `session_id` (form data) and multiple `UploadFile` objects. Processes them through Pandas or Claude Vision based on MIME type, stores them in SQLite, and returns success statuses. |
 | `GET`  | `/session/{session_id}` | Retrieves all processed documents, structured content, and text attached to a given session ID. |
+| `POST` | `/session/{session_id}/analyze` | Triggers the AI analysis pipeline (Synthesis and Pattern Detection). Aggregates all documents and wearable data to generate the medical brief. |
+| `GET`  | `/session/{session_id}/analysis` | Retrieves the previously generated synthesis and patterns for the session. |
+
+## AI Analysis Pipeline
+
+The backend includes a sophisticated analysis engine that:
+1.  **Calculates Trends**: The CSV parser automatically computes "Early 30-day" vs "Late 30-day" trends for HRV, sleep, and activity.
+2.  **Synthesizes Briefs**: Uses Claude to aggregate extracted text, CSV trends, medications, and symptom logs into a structured medical brief.
+3.  **Detects Patterns**: Identifies non-obvious correlations (e.g., relationship between missed medications and sleep quality).
 
 ## Connecting from the Frontend (Builder 2)
 
 **CORS** has been fully configured to accept cross-origin requests.
 
-To integrate from your Next.js application (running on port `3000`), you can call the API directly:
+### Example: Running Analysis
+```javascript
+const response = await fetch(`http://localhost:8000/session/${currentSessionId}/analyze`, {
+    method: 'POST'
+});
+const analysis = await response.json();
+console.log("Medical Brief:", analysis.synthesis);
+console.log("Patterns:", analysis.patterns);
+```
 
 ### Example: Uploading Files (Drag & Drop)
 ```javascript
@@ -80,7 +97,9 @@ console.log("Session Documents:", data.documents);
 
 ## Directory Structure
 - `backend/main.py`: Entry point, CORS setup, and route registration.
-- `backend/database.py`: SQLite schema and queries.
+- `backend/database.py`: SQLite schema, migration logic, and session/analysis storage.
 - `backend/routers/ingest.py`: Routes for ingestion endpoints.
-- `backend/services/claude_client.py`: Anthropic API client setup and vision extraction prompt execution.
-- `backend/services/csv_parser.py`: Pandas logic for transforming Fitbit CSV data.
+- `backend/routers/analysis.py`: Routes for triggering and retrieving AI analysis.
+- `backend/services/claude_client.py`: Anthropic API client and vision extraction logic.
+- `backend/services/analysis_service.py`: Core logic for aggregating context and calling analysis prompts.
+- `backend/services/csv_parser.py`: Pandas logic for trend calculation and "bad night" detection.

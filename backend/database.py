@@ -13,9 +13,19 @@ def init_db():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS sessions (
             session_id TEXT PRIMARY KEY,
-            created_at TEXT
+            created_at TEXT,
+            synthesis_result TEXT,
+            patterns_result TEXT
         )
     """)
+    
+    # Check if columns exist (for migration)
+    cursor.execute("PRAGMA table_info(sessions)")
+    columns = [info[1] for info in cursor.fetchall()]
+    if "synthesis_result" not in columns:
+        cursor.execute("ALTER TABLE sessions ADD COLUMN synthesis_result TEXT")
+    if "patterns_result" not in columns:
+        cursor.execute("ALTER TABLE sessions ADD COLUMN patterns_result TEXT")
     
     # Create documents table
     cursor.execute("""
@@ -44,6 +54,45 @@ def create_session() -> str:
     conn.commit()
     conn.close()
     return session_id
+
+def update_session_analysis(session_id: str, synthesis: dict = None, patterns: dict = None):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    if synthesis:
+        cursor.execute(
+            "UPDATE sessions SET synthesis_result = ? WHERE session_id = ?",
+            (json.dumps(synthesis), session_id)
+        )
+    if patterns:
+        cursor.execute(
+            "UPDATE sessions SET patterns_result = ? WHERE session_id = ?",
+            (json.dumps(patterns), session_id)
+        )
+    conn.commit()
+    conn.close()
+
+def get_session_analysis(session_id: str) -> dict:
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute("SELECT synthesis_result, patterns_result FROM sessions WHERE session_id = ?", (session_id,))
+    row = cursor.fetchone()
+    conn.close()
+    
+    if not row:
+        return None
+        
+    synthesis = None
+    patterns = None
+    if row["synthesis_result"]:
+        synthesis = json.loads(row["synthesis_result"])
+    if row["patterns_result"]:
+        patterns = json.loads(row["patterns_result"])
+        
+    return {
+        "synthesis": synthesis,
+        "patterns": patterns
+    }
 
 def insert_document(session_id: str, filename: str, file_type: str, content: dict | str) -> str:
     doc_id = str(uuid.uuid4())
