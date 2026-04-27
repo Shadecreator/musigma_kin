@@ -53,3 +53,5 @@ Thumbs.db
 temp_*.txt
 test_*.txt
 *.log
+*.db.bak
+scratch/
