@@ -1,0 +1,24 @@
+QUESTION 1 (the correlation question — use this first):
+"Show me his sleep on the nights before each confusion episode."
+
+Expected answer: Kin should show the 5 bad nights with sleep hours,
+HRV, and wakeup counts, then note all 5 preceded confusion events.
+
+QUESTION 2 (the trend question):
+"How has his HRV changed over the last 60 days?"
+
+Expected answer: Early avg 26.9ms, late avg 23.5ms, 12.6% decline.
+Trend visible in the data. Cite the CSV rows.
+
+QUESTION 3 (the medication question):
+"How many times did he miss his evening medications in the last 90 days?"
+
+Expected answer: 26 days out of 91. Specific dates available.
+Flag that missed Potassium Chloride is especially concerning
+given Furosemide use and K+ of 3.4 at ER visit.
+
+QUESTION 4 (the activity question):
+"What happened to his activity levels after the ER visit?"
+
+Expected answer: Steps dropped from ~3,800/day pre-ER to ~2,200/day
+post-ER. Active minutes halved. Sharp decline from March 22 onward.
