@@ -43,6 +43,20 @@ def run_tests():
         docs = response.json().get("documents", [])
         for doc in docs:
             print(f"  - {doc['filename']} ({doc['file_type']})")
+            
+        # Test analysis (Synthesis and Patterns)
+        print("POST /session/{session_id}/analyze : triggering AI...")
+        response = client.post(f"/session/{session_id}/analyze")
+        if response.status_code == 200:
+            analysis = response.json()
+            print("  - Synthesis Summary:", analysis.get("synthesis", {}).get("patient_summary", "Missing"))
+            print("  - Patterns Found:", len(analysis.get("patterns", {}).get("patterns", [])))
+        else:
+            print("  - Analysis failed:", response.status_code, response.text)
+            
+        # Test getting analysis
+        response = client.get(f"/session/{session_id}/analysis")
+        print("GET /session/{session_id}/analysis :", "OK" if response.status_code == 200 else "Failed")
 
 if __name__ == "__main__":
     run_tests()

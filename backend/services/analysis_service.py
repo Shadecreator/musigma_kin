@@ -101,7 +101,7 @@ Flagged bad nights: {", ".join([n['date'] for n in t['bad_nights']])}
     # Call Claude for Synthesis
     # We use the text after "SYSTEM PROMPT:" as system message and the rest as User message
     full_text = synthesis_prompt_template
-    system_part = full_text.split("CONTEXT BLOCK FORMAT :")[0]
+    system_part = full_text.split("CONTEXT BLOCK FORMAT :")[0] + "\n\nCRITICAL: The total JSON response must be under 3000 tokens. Be extremely concise. Use bullet points. Limit each section to the most important items only."
     user_part = "CONTEXT BLOCK:\n" + context_block + "\n\nINSTRUCTIONS:\n" + full_text.split("=== INSTRUCTIONS ===")[1]
     
     synthesis_result = call_claude_json(user_part, system_message=system_part)

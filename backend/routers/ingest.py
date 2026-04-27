@@ -27,10 +27,14 @@ async def ingest_documents(
         
         parsed_content = None
         
+        # Fallback for generic octet-stream if it's clearly a PDF
+        if file_type == "application/octet-stream" and filename.lower().endswith(".pdf"):
+            file_type = "application/pdf"
+
         if file_type == "application/pdf":
             # Convert to base64 for Claude Vision
             base64_pdf = base64.b64encode(content).decode("utf-8")
-            extracted_text = extract_pdf_vision(base64_pdf, media_type=file_type)
+            extracted_text = extract_pdf_vision(base64_pdf, media_type="application/pdf")
             parsed_content = {"extracted_text": extracted_text}
             
         elif file_type == "text/csv":

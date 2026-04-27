@@ -96,7 +96,7 @@ def get_session_analysis(session_id: str) -> dict:
 
 def insert_document(session_id: str, filename: str, file_type: str, content: dict | str) -> str:
     doc_id = str(uuid.uuid4())
-    content_str = json.dumps(content) if isinstance(content, dict) else content
+    content_str = json.dumps(content) if isinstance(content, (dict, list)) else content
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute(

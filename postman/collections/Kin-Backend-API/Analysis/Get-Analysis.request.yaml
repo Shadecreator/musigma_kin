@@ -1,0 +1,6 @@
+$kind: http-request
+name: Get Analysis
+method: GET
+url: "{{baseUrl}}/session/{{sessionId}}/analysis"
+description: Retrieve previously generated analysis for a session. Run /analyze first.
+order: 2000

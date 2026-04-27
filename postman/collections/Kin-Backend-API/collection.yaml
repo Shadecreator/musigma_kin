@@ -1,0 +1,8 @@
+$kind: collection
+name: Kin Backend API
+description: API collection for the Kin health data ingestion and analysis backend.
+variables:
+  - key: baseUrl
+    value: 'http://localhost:8000'
+  - key: sessionId
+    value: ''

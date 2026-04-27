@@ -1,0 +1,6 @@
+$kind: http-request
+name: Health Check
+method: GET
+url: "{{baseUrl}}/"
+description: Hello world endpoint to verify server is running.
+order: 1000

@@ -1,0 +1,6 @@
+$kind: http-request
+name: Get Session Documents
+method: GET
+url: "{{baseUrl}}/session/{{sessionId}}"
+description: Return all ingested content for a session.
+order: 2000

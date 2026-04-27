@@ -1,0 +1,6 @@
+$kind: http-request
+name: Create Session
+method: POST
+url: "{{baseUrl}}/session"
+description: Create a new session.
+order: 2000

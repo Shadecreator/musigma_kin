@@ -137,4 +137,13 @@ Using all the above, generate the brief in the exact JSON schema specified.
 Every factual claim must have a [Source: ...] citation.
 Surface non-obvious patterns across the wearable data and symptom log.
 Frame every insight as a question for the doctor.
+
+CONSTRAINTS TO PREVENT TRUNCATION:
+- patient_summary: Exactly 2-3 sentences.
+- active_conditions: Include ONLY the top 6 most clinically relevant conditions.
+- medications: List all current medications but keep timing/compliance notes concise (max 2 sentences each).
+- recent_events: Include ONLY the top 5 most significant events.
+- patterns_detected: Include ONLY the top 4 strongest correlations.
+- questions_for_doctor: Include ONLY the top 5-7 most critical questions Sara should ask.
+
 Return only valid JSON. No preamble. No explanation outside the JSON.

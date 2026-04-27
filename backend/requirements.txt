@@ -5,3 +5,4 @@ pandas
 anthropic
 python-dotenv
 pypdf
+zhipuai

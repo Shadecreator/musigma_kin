@@ -1,0 +1,6 @@
+$kind: http-request
+name: Analyze Session
+method: POST
+url: "{{baseUrl}}/session/a228c937-fe0c-4d1e-8b14-d4c61a1acb25/analyze"
+description: Trigger the AI analysis (Synthesis and Patterns) for a session.
+order: 1000

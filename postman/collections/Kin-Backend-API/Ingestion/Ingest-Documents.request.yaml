@@ -1,0 +1,23 @@
+$kind: http-request
+name: Ingest Documents
+method: POST
+url: "{{baseUrl}}/ingest"
+description: Accepts PDFs, CSV, JSON, text and stores them in SQLite. PDFs go to Claude Vision, CSVs to pandas, JSON/Text are parsed directly.
+order: 1000
+body:
+  type: formdata
+  content:
+    - type: text
+      key: session_id
+      value: "{{sessionId}}"
+      disabled: false
+    - type: file
+      key: files
+      src:
+        - /D:/Psnal/SIDE GIGS/HACKATHONS AND BOOTCAMPS/Anthropic/musigma_kin/sample_data/pawan/pdfs/2026-01-15_GP_followup.pdf
+        - /D:/Psnal/SIDE GIGS/HACKATHONS AND BOOTCAMPS/Anthropic/musigma_kin/sample_data/pawan/pdfs/2026-02-03_Cardiology_consult.pdf
+        - /D:/Psnal/SIDE GIGS/HACKATHONS AND BOOTCAMPS/Anthropic/musigma_kin/sample_data/pawan/pdfs/2026-01-15_GP_followup.pdf
+        - /D:/Psnal/SIDE GIGS/HACKATHONS AND BOOTCAMPS/Anthropic/musigma_kin/sample_data/pawan/pdfs/2026-02-03_Cardiology_consult.pdf
+        - /D:/Psnal/SIDE GIGS/HACKATHONS AND BOOTCAMPS/Anthropic/musigma_kin/sample_data/pawan/pdfs/2026-03-22_ER_discharge.pdf
+        - /D:/Psnal/SIDE GIGS/HACKATHONS AND BOOTCAMPS/Anthropic/musigma_kin/sample_data/pawan/pdfs/2026-04-10_Lab_panel.pdf
+      disabled: false

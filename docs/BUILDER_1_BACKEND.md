@@ -5,9 +5,11 @@ This document outlines the architecture, setup instructions, and integration det
 ## Architecture Overview
 
 The backend is built with **FastAPI** and uses a local **SQLite** database (`kin.db`) for session and document storage. It provides a robust ingestion pipeline capable of parsing:
-- **PDFs**: Routed to Claude Vision for structured text extraction.
-- **CSV files**: Routed to Pandas for computing statistical summaries and trends (e.g., Fitbit data).
-- **JSON / Text files**: Parsed natively and stored directly.
+- **PDFs**: Routed to Claude 4.6 Vision for structured text extraction. 
+    - *Robustness*: Automatically detects `.pdf` extensions even if MIME type is generic. 
+    - *Fallback*: Automatically falls back to local `pypdf` extraction if the AI vision API fails.
+- **CSV files**: Routed to Pandas for computing "Early 30-day" vs "Late 30-day" statistical summaries and identifying "bad night" correlations.
+- **JSON / Text files**: Parsed natively and stored directly (supports complex list/dict structures for medication lists).
 
 The system is designed with a Session-based architecture. A caregiver creates a session, uploads a bundle of files which are ingested and analyzed, and then the structured data can be retrieved by the frontend to generate the medical brief.
 
