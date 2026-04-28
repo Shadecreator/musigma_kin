@@ -1,9 +1,10 @@
-from fastapi import APIRouter, File, UploadFile, HTTPException, Form
+from fastapi import APIRouter, Depends, File, UploadFile, HTTPException, Form
 from typing import List
 import base64
 import json
 
 from backend.database import insert_document, get_session_documents
+from backend.security import get_current_user, require_session_access
 from backend.services.claude_client import extract_pdf_vision
 from backend.services.csv_parser import parse_fitbit_csv
 
@@ -12,12 +13,14 @@ router = APIRouter()
 @router.post("/ingest")
 async def ingest_documents(
     session_id: str = Form(...),
-    files: List[UploadFile] = File(...)
+    files: List[UploadFile] = File(...),
+    current_user: dict = Depends(get_current_user),
 ):
     """
     Accepts PDFs, CSV, JSON, text and stores them in SQLite.
     PDFs go to Claude Vision, CSVs to pandas, JSON/Text are parsed directly.
     """
+    require_session_access(session_id, current_user)
     results = []
     
     for file in files:
@@ -68,8 +71,9 @@ async def ingest_documents(
     return {"session_id": session_id, "ingested": results}
 
 @router.get("/session/{session_id}")
-async def get_session(session_id: str):
+async def get_session(session_id: str, current_user: dict = Depends(get_current_user)):
     """Return all ingested content for a session."""
+    require_session_access(session_id, current_user)
     docs = get_session_documents(session_id)
     if not docs:
         raise HTTPException(status_code=404, detail="Session not found or empty")

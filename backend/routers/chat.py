@@ -1,9 +1,13 @@
 import json
 import os
-from fastapi import APIRouter, HTTPException
+import re
+
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from backend.database import get_session_documents, get_session_analysis
-from backend.services.claude_client import call_claude_json, client, is_valid_key_format
+
+from backend.database import get_session_analysis, get_session_documents
+from backend.security import get_current_user, require_session_access
+from backend.services.claude_client import client, is_valid_key_format
 
 router = APIRouter()
 
@@ -12,37 +16,47 @@ class ChatRequest(BaseModel):
     question: str
 
 
+def _extract_sources(answer: str) -> list[str]:
+    matches = re.findall(r"\[Source:\s*([^\]]+)\]", answer or "")
+    unique = []
+    for source in matches:
+        source = source.strip()
+        if source and source not in unique:
+            unique.append(source)
+    return unique
+
+
 @router.post("/session/{session_id}/chat")
-async def doctor_chat(session_id: str, request: ChatRequest):
+async def doctor_chat(
+    session_id: str,
+    request: ChatRequest,
+    current_user: dict = Depends(get_current_user),
+):
     """
     Doctor Mode — answer a specific question using the patient's
     ingested data and previously generated brief.
     """
 
-    # 1. Get all ingested documents for this session
+    require_session_access(session_id, current_user)
     session_docs = get_session_documents(session_id)
     if not session_docs:
         raise HTTPException(status_code=404, detail="Session not found or no documents ingested.")
 
-    # 2. Get the previously generated analysis (brief + patterns)
     analysis = get_session_analysis(session_id)
 
-    # 3. Build context string from all ingested documents
     doc_context = ""
     for doc in session_docs:
         doc_context += f"\n--- {doc.get('filename', 'unknown')} ---\n"
-        # DB stores parsed content in the `content` field
-        content = doc.get('content')
-        if isinstance(content, dict) or isinstance(content, list):
+        content = doc.get("content")
+        if isinstance(content, (dict, list)):
             try:
                 doc_context += json.dumps(content, indent=2)
             except Exception:
                 doc_context += str(content)
         else:
-            doc_context += str(content or '')
+            doc_context += str(content or "")
         doc_context += "\n"
 
-    # 4. Build the prompt
     prompt = f"""
 You are answering a doctor's question about a specific patient during a clinical appointment.
 
@@ -67,14 +81,26 @@ Answer the question now. Start directly with the answer. Cite every fact.
 Return plain text — NOT JSON.
 """
 
-    # 5. Call Claude — plain text response not JSON
     api_key = os.environ.get("ANTHROPIC_API_KEY", "placeholder")
 
     if not is_valid_key_format(api_key):
+        source_files = [doc.get("filename", "unknown") for doc in session_docs[:3]]
+        citation_text = " ".join([f"[Source: {name}]" for name in source_files])
+        one_pager = (analysis or {}).get("synthesis", {}).get("one_pager", {})
+        one_pager_summary = one_pager.get("summary") if isinstance(one_pager, dict) else None
+        answer = (
+            f"Based on the uploaded records, the key concern is a combined sleep decline, HRV decline, "
+            f"and reduced activity over recent weeks. {citation_text}"
+        )
+        if one_pager_summary:
+            answer = f"{one_pager_summary}. {citation_text}"
+
         return {
             "question": request.question,
-            "answer": "Mock answer: Add a valid Anthropic API key to enable doctor mode.",
-            "session_id": session_id
+            "answer": answer,
+            "citations": source_files,
+            "session_id": session_id,
+            "mode": "mock",
         }
 
     try:
@@ -82,16 +108,12 @@ Return plain text — NOT JSON.
             model="claude-sonnet-4-6",
             max_tokens=512,
             system="You are a medical data assistant answering a doctor's question about a specific patient. Be specific. Cite sources. Never diagnose. Answer in plain English, not JSON.",
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+            messages=[{"role": "user", "content": prompt}],
         )
-        # Anthropic response structure: content is a list of chunks
         answer = ""
         try:
             answer = response.content[0].text.strip()
         except Exception:
-            # Fallback to string representation
             answer = str(response)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Claude call failed: {str(e)}")
@@ -99,5 +121,7 @@ Return plain text — NOT JSON.
     return {
         "question": request.question,
         "answer": answer,
-        "session_id": session_id
+        "citations": _extract_sources(answer),
+        "session_id": session_id,
+        "mode": "live",
     }

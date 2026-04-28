@@ -4,12 +4,19 @@ import json
 
 def run_tests():
     with TestClient(app) as client:
+        login_response = client.post(
+            "/auth/login",
+            json={"email": "test.account.kin@example.com", "password": "Test1234!"}
+        )
+        token = login_response.json().get("access_token")
+        headers = {"Authorization": f"Bearer {token}"} if token else {}
+
         # Test hello world
         response = client.get("/")
         print("GET / :", response.json())
         
         # Test session creation
-        response = client.post("/session")
+        response = client.post("/session", headers=headers)
         session_id = response.json().get("session_id")
         print("POST /session : created", session_id)
         
@@ -18,7 +25,7 @@ def run_tests():
             ("files", ("test.txt", b"Hello World text", "text/plain"))
         ]
         data = {"session_id": session_id}
-        response = client.post("/ingest", data=data, files=files)
+        response = client.post("/ingest", data=data, files=files, headers=headers)
         print("POST /ingest (text) :", response.json())
         
         # Test ingest text/csv
@@ -26,7 +33,7 @@ def run_tests():
         files = [
             ("files", ("data.csv", csv_content, "text/csv"))
         ]
-        response = client.post("/ingest", data=data, files=files)
+        response = client.post("/ingest", data=data, files=files, headers=headers)
         print("POST /ingest (csv) :", response.json())
         
         # Test ingest application/json
@@ -34,11 +41,11 @@ def run_tests():
         files = [
             ("files", ("meds.json", json_content, "application/json"))
         ]
-        response = client.post("/ingest", data=data, files=files)
+        response = client.post("/ingest", data=data, files=files, headers=headers)
         print("POST /ingest (json) :", response.json())
         
         # Test getting session docs
-        response = client.get(f"/session/{session_id}")
+        response = client.get(f"/session/{session_id}", headers=headers)
         print(f"GET /session/{session_id} :")
         docs = response.json().get("documents", [])
         for doc in docs:
@@ -46,7 +53,7 @@ def run_tests():
             
         # Test analysis (Synthesis and Patterns)
         print("POST /session/{session_id}/analyze : triggering AI...")
-        response = client.post(f"/session/{session_id}/analyze")
+        response = client.post(f"/session/{session_id}/analyze", headers=headers)
         if response.status_code == 200:
             analysis = response.json()
             print("  - Synthesis Summary:", analysis.get("synthesis", {}).get("patient_summary", "Missing"))
@@ -55,7 +62,7 @@ def run_tests():
             print("  - Analysis failed:", response.status_code, response.text)
             
         # Test getting analysis
-        response = client.get(f"/session/{session_id}/analysis")
+        response = client.get(f"/session/{session_id}/analysis", headers=headers)
         print("GET /session/{session_id}/analysis :", "OK" if response.status_code == 200 else "Failed")
 
 if __name__ == "__main__":
