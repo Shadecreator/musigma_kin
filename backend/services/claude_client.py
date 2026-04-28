@@ -88,6 +88,7 @@ def call_claude_json(prompt: str, system_message: str = "You are a helpful medic
     if not is_valid_key_format(api_key):
         return {"mock_response": "Add a valid Anthropic API key to .env to see real AI analysis."}
         
+    text = None
     try:
         response = client.messages.create(
             model="claude-sonnet-4-6",
@@ -102,16 +103,61 @@ def call_claude_json(prompt: str, system_message: str = "You are a helpful medic
         # Extract JSON block if Claude adds preamble
         if "```json" in text:
             text = text.split("```json")[1].split("```")[0].strip()
-        elif "{" in text:
-            text = text[text.find("{"):text.rfind("}")+1]
-            
-        return json.loads(text)
+        elif "```" in text:
+            text = text.split("```")[1].split("```")[0].strip()
+
+        # First attempt — clean parse
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            pass
+
+        # Second attempt — find outermost { }
+        start = text.find("{")
+        if start != -1:
+            # Walk from end to find a valid closing brace
+            for end in range(len(text) - 1, start, -1):
+                if text[end] == "}":
+                    candidate = text[start:end + 1]
+                    try:
+                        return json.loads(candidate)
+                    except json.JSONDecodeError:
+                        continue
+
+        # Third attempt — response was truncated, patch open braces
+        try:
+            trimmed = text.strip()
+            # Remove trailing incomplete key-value (find last complete comma or brace)
+            # Cut back to last clean boundary
+            for cut in range(len(trimmed) - 1, 0, -1):
+                ch = trimmed[cut]
+                if ch in (",", "{", "["):
+                    candidate = trimmed[:cut]
+                    # Close all open structures
+                    open_braces   = candidate.count("{") - candidate.count("}")
+                    open_brackets = candidate.count("[") - candidate.count("]")
+                    candidate += "]" * open_brackets + "}" * open_braces
+                    try:
+                        return json.loads(candidate)
+                    except json.JSONDecodeError:
+                        continue
+        except Exception:
+            pass
+
+        # Final fallback — return raw so frontend still gets something
+        return {
+            "error": "Response was truncated or malformed JSON",
+            "raw_text": text
+        }
+
     except Exception as e:
         error_msg = str(e)
         if "401" in error_msg:
             error_msg = "Invalid Anthropic API Key (401 Unauthorized). Please check your .env."
-        return {"error": f"Claude call failed: {error_msg}", "raw_text": text if 'text' in locals() else None}
-
+        return {
+            "error": f"Claude call failed: {error_msg}",
+            "raw_text": text if text else None
+        }
 def extract_text_pypdf(file_path: str) -> str:
     """Standard text extraction using pypdf."""
     import pypdf
