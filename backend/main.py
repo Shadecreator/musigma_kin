@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.database import init_db, create_session
 from backend.routers import ingest, analysis
+from backend.routers import chat
 
 app = FastAPI(title="Kin Backend API")
 
@@ -33,4 +34,5 @@ def new_session():
 # Include routers
 app.include_router(ingest.router, tags=["Ingestion"])
 app.include_router(analysis.router, tags=["Analysis"])
+app.include_router(chat.router, tags=["Chat"])
  

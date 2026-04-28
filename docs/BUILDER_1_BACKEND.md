@@ -54,6 +54,7 @@ You can view the interactive Swagger UI documentation by navigating to `http://l
 | `GET`  | `/session/{session_id}` | Retrieves all processed documents, structured content, and text attached to a given session ID. |
 | `POST` | `/session/{session_id}/analyze` | Triggers the AI analysis pipeline (Synthesis and Pattern Detection). Aggregates all documents and wearable data to generate the medical brief. |
 | `GET`  | `/session/{session_id}/analysis` | Retrieves the previously generated synthesis and patterns for the session. |
+| `POST` | `/session/{session_id}/chat` | Doctor Mode: ask a single focused question about the ingested patient data and previously generated brief. Returns a cited, plain-text answer (requires `ANTHROPIC_API_KEY` for live responses). |
 
 ## AI Analysis Pipeline
 

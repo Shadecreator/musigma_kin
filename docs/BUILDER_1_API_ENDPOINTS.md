@@ -129,6 +129,40 @@ curl http://localhost:8000/session/YOUR_SESSION_ID/analysis
 
 ---
 
+## 7. Chat / Doctor Mode
+
+- **Method**: `POST`
+- **Endpoint**: `/session/{session_id}/chat`
+- **Headers**: `Content-Type: application/json`
+- **Body**:
+  ```json
+  {
+    "question": "<Your question about the patient>"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "question": "...",
+    "answer": "Plain-text answer from Claude with inline source citations",
+    "session_id": "..."
+  }
+  ```
+
+Rules & behavior:
+- The endpoint builds context from all ingested documents and the previously generated brief (if any) and asks Claude to answer in plain text.
+- The endpoint enforces a mock response if `ANTHROPIC_API_KEY` is missing or invalid; add a valid `sk-ant-...` key in `backend/.env` to enable live answers.
+- Answers are returned as plain text in the `answer` field and aim to include explicit source citations (e.g., `[Source: fitbit_export_jan_apr_2026.csv]`).
+
+### Test with cURL:
+```bash
+curl -X POST http://localhost:8000/session/YOUR_SESSION_ID/chat \
+  -H "Content-Type: application/json" \
+  -d '{"question":"Show me his sleep on the nights before each confusion episode."}'
+```
+
+---
+
 ## 7. Using Sample Data
 To test the full capability of Kin (Synthesis and Pattern Detection), you should upload the sample data provided in the repository.
 
