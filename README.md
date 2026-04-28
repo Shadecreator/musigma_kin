@@ -93,8 +93,9 @@ The system has been verified using the **Pawan Dataset** (a complex geriatric ca
 ---
 
 ## Contributors
-- **Builder 1 (Backend)**: Siddharth Malkani
-- **Builder 2 (Frontend)**: [Integration Pending]
+- **Builder 1 **: Siddharth Malkania
+- **Builder 2 **: KRISHNA VALLABHA GOSWAMI
+- **Builder 3**: Anushree Balaji
 
 ---
 *Built for the Anthropic Hackathon 2026.*
